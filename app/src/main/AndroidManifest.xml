@@ -18,7 +18,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".StoresNearActivity" />
+        <activity android:name=".StoresNearListActivity" />
+        <activity android:name=".StoresNearItemActivity" />
     </application>
 
 </manifest>

@@ -28,8 +28,8 @@
 
     <EditText
         android:id="@+id/address_input"
-        android:layout_width="306dp"
-        android:layout_height="40dp"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -50,8 +50,8 @@
 
     <Button
         android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="32dp"
+        android:layout_width="0dp"
+        android:layout_height="39dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -64,7 +64,8 @@
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/address_input"
-        app:layout_constraintVertical_bias="0.069" />
+        app:layout_constraintVertical_bias="0.009" />
 </android.support.constraint.ConstraintLayout>

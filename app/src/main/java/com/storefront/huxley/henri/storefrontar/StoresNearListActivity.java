@@ -17,9 +17,9 @@ package com.storefront.huxley.henri.storefrontar;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -29,30 +29,37 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Vector;
 
 import cz.msebera.android.httpclient.Header;
 
-public class StoresNearActivity extends AppCompatActivity {
+public class StoresNearListActivity extends AppCompatActivity {
+    private List<Store> stores;
+    private RecyclerView recyclerView;
+    private RecyclerAdapter recyclerAdapter;
 
-    LinearLayout ll;
-    Vector<FoundStores> allStores = new Vector<FoundStores>();
-    String placesKey = "INPUT KEY";
+    String placesKey = "AIzaSyCNn3rbBz-ERQp_rH4QkCou4E5wYLl7XV0";
     String usersAddress;
-    double lat,lng;
+    double lat, lng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_storesnear);
-        ll = (LinearLayout)findViewById(R.id.ll);
+        setContentView(R.layout.activity_storesnearlist);
+
         try {
             usersAddress = Objects.requireNonNull(getIntent().getExtras()).getString("address");
+        } catch (Exception e) {
+            onBackPressed();
         }
-        catch (Exception e) {
-        onBackPressed();
-        }
+
+        stores = new ArrayList<>();
+        recyclerView = findViewById(R.id.recyclerView);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(llm);
+        recyclerView.setHasFixedSize(true);
 
         ObtainCoords();
     }
@@ -63,8 +70,7 @@ public class StoresNearActivity extends AppCompatActivity {
     Date: November 10th 2018
     */
     //////////////INCOMPLETE ADD PROPER ERROR HANDLING
-    private void ObtainCoords()
-    {
+    private void ObtainCoords() {
         String getCordsURL = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=" + usersAddress + "&inputtype=textquery&fields=geometry&key=" + placesKey;
         //Toast.makeText(this, getCordsURL, Toast.LENGTH_SHORT).show();
 
@@ -96,13 +102,12 @@ public class StoresNearActivity extends AppCompatActivity {
     }
 
     /*
-    Developer: Evan Yohnicki-Huxley
+    Developer: Evan Yohnicki-Huxley & Patrick Henri
     Purpose: Obtain Places from Coordinates. Once Found Place in Vector of Object followed by Print the list to the user
-    Date: November 10th 2018
+    Date: November 10th 2018 - updated 11/14/2018
     */
     //////////////INCOMPLETE ADD PROPER ERROR HANDLING
-    private void ObtainListOfLocations()
-    {
+    private void ObtainListOfLocations() {
         String getCordsURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lng + "&radius=1500&type=furniture_store&key=" + placesKey;
         Toast.makeText(this, getCordsURL, Toast.LENGTH_SHORT).show();
 
@@ -112,28 +117,17 @@ public class StoresNearActivity extends AppCompatActivity {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // If the response is JSONObject instead of expected JSONArray
-                FoundStores FS = null;
                 Log.d("asd", "---------------- this is response : " + response);
                 try {
                     JSONObject serverResp = new JSONObject(response.toString());
                     //JSONObject element = serverResp.getJSONArray("candidates").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
                     JSONArray element = serverResp.getJSONArray("results");
-                    for(int i=0;i<=element.length()-1;++i)
-                    {
-                        FS = new FoundStores();
-                        FS.StoreName = element.getJSONObject(i).get("name").toString();
-                        FS.OpenNow = (Boolean) element.getJSONObject(i).getJSONObject("opening_hours").get("open_now");
-                        FS.StoreAddress = element.getJSONObject(i).get("vicinity").toString();
-                        try {
-                            FS.StoreRating = (Double)element.getJSONObject(i).get("rating");
-                        }
-                       catch (Exception e){
-                            FS.StoreRating = 0.0;
-                        }
-                        allStores.add(FS);
+                    for (int i = 0; i <= element.length() - 1; ++i) {
+                        stores.add(new Store(element.getJSONObject(i).get("name").toString(), element.getJSONObject(i).get("vicinity").toString(), "0", 0));
+                        Log.d("store", "-----loop result add: " + stores.get(i).name);
                     }
-                    ListToObject();
-
+                    recyclerAdapter = new RecyclerAdapter(stores);
+                    recyclerView.setAdapter(recyclerAdapter);
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -141,21 +135,4 @@ public class StoresNearActivity extends AppCompatActivity {
             }
         });
     }
-
-    /*
-    Developer: Evan Yohnicki-Huxley
-    Purpose: Print the list to the user
-    Date: November 10th 2018
-    */
-    private void ListToObject()
-    {
-        LinearLayout linearLayout = new LinearLayout(this);
-        linearLayout.setOrientation(LinearLayout.VERTICAL);
-        for(FoundStores fs : allStores){
-            TextView tv = new TextView(this);
-            tv.setText(fs.StoreName);
-            linearLayout.addView(tv);
-        }
-        ll.addView(linearLayout);
-    }
-};
+}

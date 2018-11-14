@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onSearchClick(View view) {
-        Intent intent = new Intent(this, StoresNearActivity.class);
+        Intent intent = new Intent(this, StoresNearListActivity.class);
         intent.putExtra("address",((EditText)findViewById(R.id.address_input)).getText().toString());
         startActivity(intent);
     }
