@@ -19,7 +19,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".StoresNearListActivity" />
-        <activity android:name=".StoresNearItemActivity" />
     </application>
 
 </manifest>
