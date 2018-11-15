@@ -15,11 +15,16 @@
  */
 package com.storefront.huxley.henri.storefrontar;
 
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.NetworkOnMainThreadException;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -39,6 +44,7 @@ public class StoresNearListActivity extends AppCompatActivity {
     private List<Store> stores;
     private RecyclerView recyclerView;
     private RecyclerAdapter recyclerAdapter;
+    private ProgressBar spinner;
 
     String placesKey = "AIzaSyCNn3rbBz-ERQp_rH4QkCou4E5wYLl7XV0";
     String usersAddress;
@@ -46,6 +52,7 @@ public class StoresNearListActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_storesnearlist);
 
@@ -56,10 +63,13 @@ public class StoresNearListActivity extends AppCompatActivity {
         }
 
         stores = new ArrayList<>();
+        spinner = findViewById(R.id.progressBar1);
         recyclerView = findViewById(R.id.recyclerView);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(llm);
         recyclerView.setHasFixedSize(true);
+
+        spinner.setVisibility(View.VISIBLE);
 
         ObtainCoords();
     }
@@ -103,13 +113,13 @@ public class StoresNearListActivity extends AppCompatActivity {
 
     /*
     Developer: Evan Yohnicki-Huxley & Patrick Henri
-    Purpose: Obtain Places from Coordinates. Once Found Place in Vector of Object followed by Print the list to the user
+    Purpose: Obtain Places from Coordinates.
     Date: November 10th 2018 - updated 11/14/2018
     */
     //////////////INCOMPLETE ADD PROPER ERROR HANDLING
     private void ObtainListOfLocations() {
-        String getCordsURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lng + "&radius=1500&type=furniture_store&key=" + placesKey;
-        Toast.makeText(this, getCordsURL, Toast.LENGTH_SHORT).show();
+        String getCordsURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lng + "&radius=10000&type=furniture_store&key=" + placesKey;
+        //Toast.makeText(this, getCordsURL, Toast.LENGTH_SHORT).show();
 
         RequestParams rp = new RequestParams();
         HttpUtils.getByUrl(getCordsURL, rp, new JsonHttpResponseHandler() {
@@ -119,15 +129,21 @@ public class StoresNearListActivity extends AppCompatActivity {
                 // If the response is JSONObject instead of expected JSONArray
                 Log.d("asd", "---------------- this is response : " + response);
                 try {
+                    double rating = 0.0;
                     JSONObject serverResp = new JSONObject(response.toString());
                     //JSONObject element = serverResp.getJSONArray("candidates").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
                     JSONArray element = serverResp.getJSONArray("results");
                     for (int i = 0; i <= element.length() - 1; ++i) {
-                        stores.add(new Store(element.getJSONObject(i).get("name").toString(), element.getJSONObject(i).get("vicinity").toString(), "0", 0));
+                        if(element.getJSONObject(i).has("rating")) {
+                           rating = element.getJSONObject(i).getDouble("rating");
+                        }
+                        stores.add(new Store(element.getJSONObject(i).get("name").toString(), element.getJSONObject(i).get("vicinity").toString(), (float)rating));
                         Log.d("store", "-----loop result add: " + stores.get(i).name);
                     }
+                    //stores.sort(); //sort by rating pls
                     recyclerAdapter = new RecyclerAdapter(stores);
                     recyclerView.setAdapter(recyclerAdapter);
+                    spinner.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
