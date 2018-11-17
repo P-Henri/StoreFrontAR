@@ -15,10 +15,7 @@
  */
 package com.storefront.huxley.henri.storefrontar;
 
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.NetworkOnMainThreadException;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -41,6 +38,7 @@ import java.util.Objects;
 import cz.msebera.android.httpclient.Header;
 
 public class StoresNearListActivity extends AppCompatActivity {
+    public int x = 0;
     private List<Store> stores;
     private RecyclerView recyclerView;
     private RecyclerAdapter recyclerAdapter;
@@ -116,10 +114,8 @@ public class StoresNearListActivity extends AppCompatActivity {
     Purpose: Obtain Places from Coordinates.
     Date: November 10th 2018 - updated 11/14/2018
     */
-    //////////////INCOMPLETE ADD PROPER ERROR HANDLING
     private void ObtainListOfLocations() {
         String getCordsURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lng + "&radius=10000&type=furniture_store&key=" + placesKey;
-        //Toast.makeText(this, getCordsURL, Toast.LENGTH_SHORT).show();
 
         RequestParams rp = new RequestParams();
         HttpUtils.getByUrl(getCordsURL, rp, new JsonHttpResponseHandler() {
@@ -130,25 +126,64 @@ public class StoresNearListActivity extends AppCompatActivity {
                 Log.d("asd", "---------------- this is response : " + response);
                 try {
                     double rating = 0.0;
+                    String photoref = "";
                     JSONObject serverResp = new JSONObject(response.toString());
                     //JSONObject element = serverResp.getJSONArray("candidates").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
                     JSONArray element = serverResp.getJSONArray("results");
                     for (int i = 0; i <= element.length() - 1; ++i) {
-                        if(element.getJSONObject(i).has("rating")) {
-                           rating = element.getJSONObject(i).getDouble("rating");
+                        if (element.getJSONObject(i).has("rating")) {
+                            rating = element.getJSONObject(i).getDouble("rating");
                         }
-                        stores.add(new Store(element.getJSONObject(i).get("name").toString(), element.getJSONObject(i).get("vicinity").toString(), (float)rating));
-                        Log.d("store", "-----loop result add: " + stores.get(i).name);
+                        if (element.getJSONObject(i).has("photos")) {
+                            photoref = element.getJSONObject(i).getJSONArray("photos").getJSONObject(0).get("photo_reference").toString();
+                        }
+                        stores.add(new Store(element.getJSONObject(i).get("name").toString(), element.getJSONObject(i).get("vicinity").toString(), (float) rating, element.getJSONObject(i).get("reference").toString(), photoref));
                     }
                     //stores.sort(); //sort by rating pls
                     recyclerAdapter = new RecyclerAdapter(stores);
                     recyclerView.setAdapter(recyclerAdapter);
                     spinner.setVisibility(View.GONE);
+                    ObtainExtras();
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
         });
+    }
+
+    /* Developer: Patrick Henri
+       Purpose: Obtains extra info for Places found earlier from Coordinates.
+       Date: November 17th 2018
+    */
+    private void ObtainExtras() {
+        RequestParams rp = new RequestParams();
+        for (int i = 0; i < stores.size(); ++i) {
+            Log.d("aids", "achieved");
+            x = i;
+            String url = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + stores.get(i).reference + "&key=" + placesKey;
+            HttpUtils.getByUrl(url, rp, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    String phoneno = "";
+                    String website = "";
+                    try {
+                        JSONObject serverResp = new JSONObject(response.toString());
+                        JSONObject element = serverResp.getJSONObject("result");
+                        if (element.has("website")) {
+                            website = element.get("website").toString();
+                        }
+                        if (element.has("formatted_phone_number")) {
+                            phoneno = element.get("formatted_phone_number").toString();
+                        }
+                        stores.get(x).SetExtras(website, phoneno);
+                        Log.d("asd", "---------------- this is response : " + stores.get(x).websiteUrl);
+                    } catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 }
