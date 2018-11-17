@@ -10,13 +10,15 @@ public class Store implements Serializable {
     public String reference;
     public String websiteUrl;
     public String phoneno;
+    public Product selectedProduct;
 
-    public Store(String name, String address, float rating, String reference, String photoReference) {
+    public Store(String name, String address, float rating, String reference, String photoReference, Product selectedProduct) {
         this.name = name;
         this.address = address;
         this.rating = rating;
         this.reference = reference;
         this.photoReference = photoReference;
+        this.selectedProduct = selectedProduct;
     }
 
     public void SetExtras(String websiteUrl, String phoneno) {

@@ -30,16 +30,24 @@ import com.loopj.android.http.RequestParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xml.sax.Parser;
 
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 import cz.msebera.android.httpclient.Header;
 
 public class StoresNearListActivity extends AppCompatActivity {
     public int x = 0;
     private List<Store> stores;
+    Random rnd = new Random();
+    private List<Product> products;
     private RecyclerView recyclerView;
     private RecyclerAdapter recyclerAdapter;
     private ProgressBar spinner;
@@ -53,6 +61,8 @@ public class StoresNearListActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_storesnearlist);
+
+        addProducts();
 
         try {
             usersAddress = Objects.requireNonNull(getIntent().getExtras()).getString("address");
@@ -70,6 +80,13 @@ public class StoresNearListActivity extends AppCompatActivity {
         spinner.setVisibility(View.VISIBLE);
 
         ObtainCoords();
+    }
+
+
+    private void addProducts()
+    {
+        products = new ArrayList<Product>();
+        products.add(new Product("Stool","stool","stool","$52.99"));
     }
 
     /*
@@ -137,7 +154,7 @@ public class StoresNearListActivity extends AppCompatActivity {
                         if (element.getJSONObject(i).has("photos")) {
                             photoref = element.getJSONObject(i).getJSONArray("photos").getJSONObject(0).get("photo_reference").toString();
                         }
-                        stores.add(new Store(element.getJSONObject(i).get("name").toString(), element.getJSONObject(i).get("vicinity").toString(), (float) rating, element.getJSONObject(i).get("reference").toString(), photoref));
+                        stores.add(new Store(element.getJSONObject(i).get("name").toString(), element.getJSONObject(i).get("vicinity").toString(), (float) rating, element.getJSONObject(i).getString("reference"), photoref,products.get(rnd.nextInt(products.size()))));
                     }
                     //stores.sort(); //sort by rating pls
                     recyclerAdapter = new RecyclerAdapter(stores);

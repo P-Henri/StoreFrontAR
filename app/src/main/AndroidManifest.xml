@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera.ar" />
 
     <application
         android:allowBackup="true"
@@ -22,6 +24,10 @@
         </activity>
         <activity android:name=".StoresNearListActivity" />
         <activity android:name=".StoreItemView" />
+        <activity android:name=".ARCore"/>
+
+        <meta-data android:name="com.google.ar.core" android:value="required" />
+
     </application>
 
 </manifest>
