@@ -33,6 +33,7 @@ public class ARCore extends AppCompatActivity {
     private ModelRenderable modelRenderable;
     private String file_name;
     private Boolean hasBeenAdded = false;
+    private AnchorNode aNode = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +95,7 @@ public class ARCore extends AppCompatActivity {
 
         // attach this anchor to the scene
         anchorNode.setParent(arFragment.getArSceneView().getScene());
-
+        aNode = anchorNode;
         return anchorNode;
     }
 
@@ -145,9 +146,10 @@ public class ARCore extends AppCompatActivity {
     }
 
     public void btn_Reset(View view) {
-        Intent intent = getIntent();
-        finish();
-        startActivity(intent);
+        aNode.getAnchor().detach();
+        //   Intent intent = getIntent();
+     //   finish();
+      //  startActivity(intent);
     }
 
 }

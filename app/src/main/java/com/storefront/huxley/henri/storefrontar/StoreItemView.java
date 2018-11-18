@@ -81,7 +81,7 @@ public class StoreItemView extends AppCompatActivity {
 
     public void viewInAR(View view) {
         Intent intent = new Intent(this, ARCore.class);
-        intent.putExtra("filename", product.productObjectName + ".sfb");
+        intent.putExtra("filename", store.selectedProduct.productObjectName + ".sfb");
         startActivity(intent);
     }
 
