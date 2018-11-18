@@ -52,7 +52,7 @@ public class StoresNearListActivity extends AppCompatActivity {
     private RecyclerAdapter recyclerAdapter;
     private ProgressBar spinner;
 
-    String placesKey = "AIzaSyCNn3rbBz-ERQp_rH4QkCou4E5wYLl7XV0";
+
     String usersAddress;
     double lat, lng;
 
@@ -61,14 +61,11 @@ public class StoresNearListActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_storesnearlist);
-
         addProducts();
 
-        try {
-            usersAddress = Objects.requireNonNull(getIntent().getExtras()).getString("address");
-        } catch (Exception e) {
-            onBackPressed();
-        }
+        lat = (getIntent().getExtras()).getDouble("lat");
+        lng = (getIntent().getExtras()).getDouble("lng");
+
 
         stores = new ArrayList<>();
         spinner = findViewById(R.id.progressBar1);
@@ -79,7 +76,7 @@ public class StoresNearListActivity extends AppCompatActivity {
 
         spinner.setVisibility(View.VISIBLE);
 
-        ObtainCoords();
+        ObtainListOfLocations();
     }
 
 
@@ -89,42 +86,7 @@ public class StoresNearListActivity extends AppCompatActivity {
         products.add(new Product("Stool","stool","stool","$52.99"));
     }
 
-    /*
-    Developer: Evan Yohnicki-Huxley
-    Purpose: Obtain User Coordinates using Place API. Once Found and Obtained Obtain the List of Locations
-    Date: November 10th 2018
-    */
-    //////////////INCOMPLETE ADD PROPER ERROR HANDLING
-    private void ObtainCoords() {
-        String getCordsURL = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=" + usersAddress + "&inputtype=textquery&fields=geometry&key=" + placesKey;
-        //Toast.makeText(this, getCordsURL, Toast.LENGTH_SHORT).show();
 
-        RequestParams rp = new RequestParams();
-        //rp.add("username", "aaa"); rp.add("password", "aaa@123");
-
-        HttpUtils.getByUrl(getCordsURL, rp, new JsonHttpResponseHandler() {
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                // If the response is JSONObject instead of expected JSONArray
-                Log.d("asd", "---------------- this is response : " + response);
-                try {
-                    JSONObject serverResp = new JSONObject(response.toString());
-                    JSONObject element = serverResp.getJSONArray("candidates").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
-                    lat = element.getDouble("lat");
-                    lng = element.getDouble("lng");
-                    ObtainListOfLocations();
-                } catch (JSONException e) {
-                    onBackPressed();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-            }
-        });
-    }
 
     /*
     Developer: Evan Yohnicki-Huxley & Patrick Henri
@@ -132,7 +94,7 @@ public class StoresNearListActivity extends AppCompatActivity {
     Date: November 10th 2018 - updated 11/14/2018
     */
     private void ObtainListOfLocations() {
-        String getCordsURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lng + "&radius=10000&type=furniture_store&key=" + placesKey;
+        String getCordsURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lng + "&radius=10000&type=furniture_store&key=" + getResources().getString(R.string.placesKey);
 
         RequestParams rp = new RequestParams();
         HttpUtils.getByUrl(getCordsURL, rp, new JsonHttpResponseHandler() {
@@ -178,7 +140,7 @@ public class StoresNearListActivity extends AppCompatActivity {
         for (int i = 0; i < stores.size(); ++i) {
             Log.d("aids", "achieved");
             x = i;
-            String url = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + stores.get(i).reference + "&key=" + placesKey;
+            String url = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + stores.get(i).reference + "&key=" + getResources().getString(R.string.placesKey);
             HttpUtils.getByUrl(url, rp, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {

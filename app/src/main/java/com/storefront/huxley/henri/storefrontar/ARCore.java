@@ -3,11 +3,13 @@ package com.storefront.huxley.henri.storefrontar;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.ar.core.Anchor;
@@ -30,16 +32,12 @@ public class ARCore extends AppCompatActivity {
     private ViewRenderable viewRenderable;
     private ModelRenderable modelRenderable;
     private String file_name;
+    private Boolean hasBeenAdded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            file_name = getIntent().getExtras().getString("filename");
-            Toast.makeText(this, file_name, Toast.LENGTH_LONG).show();
-        }catch(Exception E) {
-            Log.e("ARCORE_ONCREATE", "Needs File Name Intent.");
-        }
+        file_name = getIntent().getExtras().getString("filename");
 
         // make sure OpenGL version is supported
 
@@ -63,7 +61,6 @@ public class ARCore extends AppCompatActivity {
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
 
         // load the renderables
-        //buildAndroidWidgetModel();
         build3dModel();
 
         // handle taps
@@ -72,19 +69,21 @@ public class ARCore extends AppCompatActivity {
 
     private void handleUserTaps() {
         arFragment.setOnTapArPlaneListener((hitResult, plane, motionEvent) -> {
+            if(!hasBeenAdded) {
+                hasBeenAdded = true;
+                // viewRenderable must be loaded
+                if (modelRenderable == null) {
+                    return;
+                }
 
-            // viewRenderable must be loaded
-            if (modelRenderable ==  null) {
-                return;
+                // create the an anchor on the scene
+                AnchorNode anchorNode = createAnchorNode(hitResult);
+
+                // add the view to the scene
+                addRenderableToScene(anchorNode, modelRenderable);
             }
-
-            // create the an anchor on the scene
-            AnchorNode anchorNode = createAnchorNode(hitResult);
-
-            // add the view to the scene
-            addRenderableToScene(anchorNode, modelRenderable);
-
         });
+
     }
 
     private AnchorNode createAnchorNode(HitResult hitResult) {
@@ -107,53 +106,9 @@ public class ARCore extends AppCompatActivity {
         node.setParent(anchorNode);
         node.setRenderable(renderable);
         node.select();
-
         return node;
     }
 
-    /**
-     * Creates a {@link ViewRenderable} which will inflate the hello_world_view.
-     *
-     * Note: The resources get loaded on the background thread automagically.
-     *       'thenAccept' is the callback for completion.
-
-    private void buildAndroidWidgetModel() {
-
-        ViewRenderable.builder()
-                .setView(this, R.layout.hello_world_view)
-                .build()
-                .thenAccept(renderable -> {
-                    viewRenderable = renderable;
-
-                    if (viewRenderable != null) {
-                        // get the view from the renderable
-                        View androidView = viewRenderable.getView();
-
-                        //Button btnToast = androidView.findViewById(R.id.button_toast);
-                        //btnToast.setOnClickListener(view -> {
-                         //   Toast.makeText(MainActivity.this, "Hello World",
-                          //          Toast.LENGTH_LONG).show();
-                        //});
-                    }
-                })
-                .exceptionally(throwable -> {
-                    Toast.makeText(ARCore.this, "Unable to display Hello World",
-                            Toast.LENGTH_LONG).show();
-
-                    return null;
-                });
-    }
-     */
-
-    /**
-     * Creates a {@link ModelRenderable} which will load the helloWorld.sfb from the assets folder.
-     *
-     * Note: The resources get loaded on the background thread automagically.
-     *       'thenAccept' is the callback for completion.
-     *
-     *       helloWorld.sfb was added to the assets folder by the Sceneform plugin when we imported
-     *       the asset
-     */
     private void build3dModel() {
 
         ModelRenderable.builder()
@@ -165,20 +120,11 @@ public class ARCore extends AppCompatActivity {
                 .exceptionally(throwable -> {
                     Toast.makeText(ARCore.this, "Unable to display model",
                             Toast.LENGTH_LONG).show();
-
                     return null;
                 });
     }
 
 
-    /**
-     * Checks to see if Sceneform can run on the device OpenGL version.
-     *
-     * @param activity
-     *      - ${@link Activity} from which to fetch the system services.
-     *
-     * @return true if Sceneform can run; false otherwise.
-     */
     private boolean checkIsSupportedDevice(final Activity activity) {
 
         ActivityManager activityManager =
@@ -192,6 +138,16 @@ public class ARCore extends AppCompatActivity {
         String openGlVersion = activityManager.getDeviceConfigurationInfo().getGlEsVersion();
 
         return openGlVersion != null && Double.parseDouble(openGlVersion) >= MIN_OPENGL_VERSION;
+    }
+
+    public void btn_Return(View view) {
+        onBackPressed();
+    }
+
+    public void btn_Reset(View view) {
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
     }
 
 }
