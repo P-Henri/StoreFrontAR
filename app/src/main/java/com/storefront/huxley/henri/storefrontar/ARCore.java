@@ -146,10 +146,10 @@ public class ARCore extends AppCompatActivity {
     }
 
     public void btn_Reset(View view) {
-        aNode.getAnchor().detach();
-        //   Intent intent = getIntent();
-     //   finish();
-      //  startActivity(intent);
+        if(aNode != null) {
+            aNode.getAnchor().detach();
+        }
+        hasBeenAdded = false;
     }
 
 }

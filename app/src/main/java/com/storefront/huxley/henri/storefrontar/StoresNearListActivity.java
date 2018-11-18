@@ -83,7 +83,11 @@ public class StoresNearListActivity extends AppCompatActivity {
     private void addProducts()
     {
         products = new ArrayList<Product>();
-        products.add(new Product("Stool","stool","stool","$52.99"));
+        products.add(new Product("Bench","A Bench made from quality walnut wood.","bench","$212.99"));
+        products.add(new Product("Coffee Table","A modern take on a required peice of furniture for all homes. Great to wow your guests with your sophisticated style.","coffeetable","$122.99"));
+        products.add(new Product("Modern Sectional Couch","A beautiful white sectional couch to show off your style and eye for quality furniture.","couch","$1202.99"));
+        products.add(new Product("Wooden Bed Side Table","A small and basic wooden bedside table with metal handles","eb_nightstand_01","$172.99"));
+        products.add(new Product("Wooden Dinning Room Table","A perfect standard wooden table for a large families looking to get together around the table.","table","$319.99"));
     }
 
 

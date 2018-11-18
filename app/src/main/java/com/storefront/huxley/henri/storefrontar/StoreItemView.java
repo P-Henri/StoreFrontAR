@@ -1,5 +1,7 @@
 package com.storefront.huxley.henri.storefrontar;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -33,6 +35,7 @@ public class StoreItemView extends AppCompatActivity {
     private TextView name, address, website, phone, price, description;
     private RatingBar rating;
     private Random rnd = new Random();
+    private static final double MIN_OPENGL_VERSION = 3.0;
     Product product;
     Store store;
 
@@ -65,10 +68,14 @@ public class StoreItemView extends AppCompatActivity {
         ((TextView) findViewById(R.id.storeitem_description)).setText(store.selectedProduct.productDescription);
         ((TextView) findViewById(R.id.storeitem_price)).setText(store.selectedProduct.productCost);
 
-
-        Resources resources = this.getResources();
-        final int resourceId = resources.getIdentifier(store.selectedProduct.productObjectName, "drawable", this.getPackageName());
-        ((ImageView) findViewById(R.id.productImg)).setImageDrawable(resources.getDrawable(resourceId));
+        try {
+            Resources resources = this.getResources();
+            final int resourceId = resources.getIdentifier(store.selectedProduct.productObjectName, "drawable", this.getPackageName());
+            ((ImageView) findViewById(R.id.productImg)).setImageDrawable(resources.getDrawable(resourceId));
+        }
+        catch(Exception e){
+            ((ImageView) findViewById(R.id.productImg)).setVisibility(View.INVISIBLE);
+        }
 
     }
 
@@ -84,6 +91,7 @@ public class StoreItemView extends AppCompatActivity {
         intent.putExtra("filename", store.selectedProduct.productObjectName + ".sfb");
         startActivity(intent);
     }
+
 
     public void openPhone(View view) {
         Intent intent = new Intent(Intent.ACTION_DIAL);

@@ -58,7 +58,29 @@ dependencies {
 
 }
 
-sceneform.asset('sampledata/stool/stool.obj',
+
+sceneform.asset('sampledata/bench/bench.obj',
         'default',
-        'sampledata/stool/stool.sfa',
-        'src/main/assets/stool')
+        'sampledata/bench/bench.sfa',
+        'src/main/assets/bench')
+
+
+sceneform.asset('sampledata/table/table.obj',
+        'default',
+        'sampledata/table/table.sfa',
+        'src/main/assets/table')
+
+sceneform.asset('sampledata/coffeetable/coffeetable.obj',
+        'default',
+        'sampledata/coffeetable/coffeetable.sfa',
+        'src/main/assets/coffeetable')
+
+sceneform.asset('sampledata/couch/couch.obj',
+        'default',
+        'sampledata/couch/couch.sfa',
+        'src/main/assets/couch')
+
+sceneform.asset('sampledata/nightstand/eb_nightstand_01.obj',
+        'default',
+        'sampledata/nightstand/eb_nightstand_01.sfa',
+        'src/main/assets/eb_nightstand_01')

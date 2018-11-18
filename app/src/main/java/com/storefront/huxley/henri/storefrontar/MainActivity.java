@@ -95,13 +95,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 }
 
     public void onUserCoords(View view) {
-        ((TextView)findViewById(R.id.txt_Searching)).setVisibility(View.VISIBLE);
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "PERMISSION ERROR", Toast.LENGTH_SHORT).show();
-            return;
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         }
-        locationManager.requestLocationUpdates("gps", 0, 0, this);
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+        ((TextView) findViewById(R.id.txt_Searching)).setVisibility(View.VISIBLE);
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates("gps", 0, 0, this);
+
     }
 
     @Override
