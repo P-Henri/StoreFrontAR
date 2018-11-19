@@ -98,7 +98,7 @@ public class StoresNearListActivity extends AppCompatActivity {
     Date: November 10th 2018 - updated 11/14/2018
     */
     private void ObtainListOfLocations() {
-        String getCordsURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lng + "&radius=10000&type=furniture_store&key=" + getResources().getString(R.string.placesKey);
+        String getCordsURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lng + "&radius=50000&type=furniture_store&key=" + getResources().getString(R.string.placesKey);
 
         RequestParams rp = new RequestParams();
         HttpUtils.getByUrl(getCordsURL, rp, new JsonHttpResponseHandler() {

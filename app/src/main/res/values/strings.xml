@@ -14,4 +14,6 @@
 
 
     <string name="placesKey">AIzaSyCNn3rbBz-ERQp_rH4QkCou4E5wYLl7XV0</string>
+    <string name="pullCoords">Pulling Coords</string>
+    <string name="errorCoords">Error Could Not Find Supplied Address</string>
 </resources>

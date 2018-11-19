@@ -2,6 +2,7 @@ package com.storefront.huxley.henri.storefrontar;
 
 import android.Manifest;
 import android.app.Activity;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -83,7 +84,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 startActivity(intent);
 
             } catch (JSONException e) {
-                onBackPressed();
+                ((TextView) findViewById(R.id.txt_Searching)).setText(R.string.errorCoords);
+                ((TextView) findViewById(R.id.txt_Searching)).setVisibility(View.VISIBLE);
             }
         }
 
@@ -102,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
+        ((TextView) findViewById(R.id.txt_Searching)).setText(R.string.pullCoords);
         ((TextView) findViewById(R.id.txt_Searching)).setVisibility(View.VISIBLE);
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             locationManager.requestLocationUpdates("gps", 0, 0, this);
@@ -120,9 +123,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        onUserCoords(findViewById(R.id.txt_Searching));
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ((TextView) findViewById(R.id.txt_Searching)).setVisibility(View.INVISIBLE);
 
-
+    }
 
     /* REQUIRED LISTENERS */
     @Override
