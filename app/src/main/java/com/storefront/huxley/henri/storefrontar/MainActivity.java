@@ -23,6 +23,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -47,10 +48,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     double lat, lng;
     private LocationManager locationManager;
+    private Button buttonSearch;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        buttonSearch = findViewById(R.id.button_search);
     }
 
     /*
@@ -59,68 +64,66 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     Date: November 10th 2018
     */
     public void onSearchClick(View view) {
-
+        buttonSearch.setClickable(false);
         String getCordsURL = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=" + ((EditText) findViewById(R.id.address_input)).getText().toString() + "&inputtype=textquery&fields=geometry&key=" + getResources().getString(R.string.placesKey);
         //Toast.makeText(this, getCordsURL, Toast.LENGTH_SHORT).show();
 
         RequestParams rp = new RequestParams();
-    //rp.add("username", "aaa"); rp.add("password", "aaa@123");
+        //rp.add("username", "aaa"); rp.add("password", "aaa@123");
 
         HttpUtils.getByUrl(getCordsURL, rp, new JsonHttpResponseHandler() {
 
-        @Override
-        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-            // If the response is JSONObject instead of expected JSONArray
-            Log.d("asd", "---------------- this is response : " + response);
-            try {
-                JSONObject serverResp = new JSONObject(response.toString());
-                JSONObject element = serverResp.getJSONArray("candidates").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
-                lat = element.getDouble("lat");
-                lng = element.getDouble("lng");
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                // If the response is JSONObject instead of expected JSONArray
+                Log.d("asd", "---------------- this is response : " + response);
+                try {
+                    JSONObject serverResp = new JSONObject(response.toString());
+                    JSONObject element = serverResp.getJSONArray("candidates").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
+                    lat = element.getDouble("lat");
+                    lng = element.getDouble("lng");
 
-                Intent intent = new Intent(MainActivity.this, StoresNearListActivity.class);
-                intent.putExtra("lat", lat);
-                intent.putExtra("lng", lng);
-                startActivity(intent);
+                    Intent intent = new Intent(MainActivity.this, StoresNearListActivity.class);
+                    intent.putExtra("lat", lat);
+                    intent.putExtra("lng", lng);
+                    startActivity(intent);
 
-            } catch (JSONException e) {
-                ((TextView) findViewById(R.id.txt_Searching)).setText(R.string.errorCoords);
-                ((TextView) findViewById(R.id.txt_Searching)).setVisibility(View.VISIBLE);
+                } catch (JSONException e) {
+                    ((TextView) findViewById(R.id.txt_Searching)).setText(R.string.errorCoords);
+                    ((TextView) findViewById(R.id.txt_Searching)).setVisibility(View.VISIBLE);
+                }
             }
-        }
 
-        @Override
-        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-            super.onFailure(statusCode, headers, throwable, errorResponse);
-        }
-    });
-}
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+        });
+        buttonSearch.setClickable(true);
+    }
 
     public void onUserCoords(View view) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         }
 
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
         ((TextView) findViewById(R.id.txt_Searching)).setText(R.string.pullCoords);
         ((TextView) findViewById(R.id.txt_Searching)).setVisibility(View.VISIBLE);
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates("gps", 0, 0, this);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates("gps", 0, 0, this);
 
     }
 
     @Override
     public void onLocationChanged(Location location) {
-
         locationManager.removeUpdates(this);
         Intent intent = new Intent(MainActivity.this, StoresNearListActivity.class);
-        intent.putExtra("lat",location.getLatitude());
-        intent.putExtra("lng",location.getLongitude());
+        intent.putExtra("lat", location.getLatitude());
+        intent.putExtra("lng", location.getLongitude());
         startActivity(intent);
-
-
     }
 
     @Override
@@ -138,12 +141,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     /* REQUIRED LISTENERS */
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) { }
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+    }
 
     @Override
-    public void onProviderEnabled(String provider) { }
+    public void onProviderEnabled(String provider) {
+    }
 
     @Override
-    public void onProviderDisabled(String provider) { }
-
+    public void onProviderDisabled(String provider) {
+    }
 }

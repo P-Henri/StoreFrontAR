@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.preference.PreferenceActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -31,7 +32,7 @@ import java.util.Random;
 import cz.msebera.android.httpclient.Header;
 
 public class StoreItemView extends AppCompatActivity {
-    private ImageView image;
+    private ImageView image, image2;
     private TextView name, address, website, phone, price, description;
     private RatingBar rating;
     private Random rnd = new Random();
@@ -52,18 +53,24 @@ public class StoreItemView extends AppCompatActivity {
         phone = findViewById(R.id.storeitem_phone);
         price = findViewById(R.id.storeitem_price);
         rating = findViewById(R.id.storeitem_rating);
+        image2 = findViewById(R.id.imageView2);
+
+        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+        image2.setMinimumWidth(displayMetrics.widthPixels);
 
         name.setText(store.name);
         hideIfNull(address, store.address);
-        hideIfNull(website, store.websiteUrl);
+        if(store.websiteUrl != null) {
+            website.setText("click here to view website");
+        }
+        else {
+            hideIfNull(website, store.websiteUrl);
+        }
         hideIfNull(phone, store.phoneno);
 
-
-        rating.setMax(5);
+        rating.setNumStars(5);
         rating.setIsIndicator(true);
-
         rating.setRating(store.rating);
-
 
         ((TextView) findViewById(R.id.storeitem_description)).setText(store.selectedProduct.productDescription);
         ((TextView) findViewById(R.id.storeitem_price)).setText(store.selectedProduct.productCost);
@@ -76,7 +83,6 @@ public class StoreItemView extends AppCompatActivity {
         catch(Exception e){
             ((ImageView) findViewById(R.id.productImg)).setVisibility(View.INVISIBLE);
         }
-
     }
 
     public void hideIfNull(TextView txt, String value) {

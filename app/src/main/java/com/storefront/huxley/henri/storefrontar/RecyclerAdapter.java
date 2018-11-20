@@ -25,10 +25,9 @@ import static android.support.v4.app.ActivityCompat.startActivityForResult;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreView> {
     static private List<Store> stores;
-    RecyclerAdapter rc = this;
-    static int cardViewIndexId = 0;
+    static private int cardViewIndexId = 0;
+    private Vector<Integer> intexAssignedClickEvent = new Vector<>();
     public static class StoreView extends RecyclerView.ViewHolder {
-        StoreView sv = this;
         Store store;
         CardView cardView;
         TextView storeName;
@@ -40,9 +39,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreV
             super(itemView);
 
             cardView = itemView.findViewById(R.id.cv);
-
-
-
             storeName = itemView.findViewById(R.id.store_name);
             storeAddress = itemView.findViewById(R.id.store_address);
             storeRating = itemView.findViewById(R.id.store_rating);
@@ -55,11 +51,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreV
 
     RecyclerAdapter(List<Store> stores) {
         this.stores = stores;
-
         cardViewIndexId = 0;
     }
-
-
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
@@ -72,7 +65,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreV
         return new StoreView(view);
     }
 
-    Vector<Integer> intexAssignedClickEvent = new Vector<>();
     @Override
     public void onBindViewHolder(StoreView storeView, int i) {
         storeView.storeName.setText(stores.get(i).name);

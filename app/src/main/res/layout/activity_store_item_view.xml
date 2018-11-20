@@ -7,39 +7,55 @@
     tools:context=".StoreItemView">
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="392dp"
-        android:layout_height="133dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:id="@+id/imageView2"
+        android:layout_width="0dp"
+        android:layout_height="57dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitStart"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.51"
+        app:layout_constraintHorizontal_bias="0.214"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@color/colorPrimary" />
 
-    <LinearLayout
-        android:layout_width="373dp"
-        android:layout_height="420dp"
-        android:layout_marginStart="8dp"
+    <TextView
+        android:id="@+id/storeitem_name"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        android:textColor="@android:color/background_light"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/storeitem_name"
+            android:id="@+id/filler"
             android:layout_width="match_parent"
-            android:layout_height="36dp"
-            android:text="TextView"
-            android:textSize="20sp" />
+            android:layout_height="50dp"
+            android:text=""
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <RatingBar
             android:id="@+id/storeitem_rating"
-            style="@android:style/Widget.Material.Light.RatingBar.Small"
+            style="@android:style/Widget.Material.RatingBar.Indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:numStars="5"
@@ -59,14 +75,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="openWebsite"
-            android:text="TextView" />
+            android:text="TextView"
+            android:textColor="@android:color/holo_blue_dark" />
 
         <TextView
             android:id="@+id/storeitem_phone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="openPhone"
-            android:text="TextView" />
+            android:text="TextView"
+            android:textColor="@android:color/holo_blue_dark" />
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -76,9 +94,9 @@
                 android:id="@+id/button3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
                 android:layout_marginBottom="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
                 android:onClick="viewInAR"
                 android:text="@string/button_ar"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -89,9 +107,9 @@
                 android:id="@+id/productImg"
                 android:layout_width="208dp"
                 android:layout_height="112dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.496"
                 app:layout_constraintStart_toStartOf="parent"
@@ -102,9 +120,9 @@
                 android:id="@+id/textView7"
                 android:layout_width="wrap_content"
                 android:layout_height="16dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
                 android:text="@string/featured_product"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.298"
@@ -115,22 +133,22 @@
                 android:id="@+id/storeitem_price"
                 android:layout_width="wrap_content"
                 android:layout_height="16dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
                 android:text="TextView"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.749"
+                app:layout_constraintHorizontal_bias="0.784"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/productImg" />
 
             <TextView
                 android:id="@+id/storeitem_description"
                 android:layout_width="130dp"
-                android:layout_height="62dp"
+                android:layout_height="195dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
                 android:text="TextView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.325"
@@ -139,4 +157,5 @@
         </android.support.constraint.ConstraintLayout>
 
     </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>
