@@ -6,6 +6,7 @@ import android.media.Rating;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,16 +17,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import static android.support.v4.app.ActivityCompat.startActivityForResult;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreView> {
     static private List<Store> stores;
+    RecyclerAdapter rc = this;
     static int cardViewIndexId = 0;
     public static class StoreView extends RecyclerView.ViewHolder {
         StoreView sv = this;
-
+        Store store;
         CardView cardView;
         TextView storeName;
         TextView storeAddress;
@@ -36,19 +40,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreV
             super(itemView);
 
             cardView = itemView.findViewById(R.id.cv);
-            cardView.setId(cardViewIndexId);
-            ++cardViewIndexId;
-            cardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Context c = v.getContext();
-                    Intent intent = new Intent(v.getContext(), StoreItemView.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("store_data", stores.get(v.getId()));
-                    intent.putExtras(bundle);
-                    c.startActivity(intent);
-                }
-            });
+
+
 
             storeName = itemView.findViewById(R.id.store_name);
             storeAddress = itemView.findViewById(R.id.store_address);
@@ -62,7 +55,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreV
 
     RecyclerAdapter(List<Store> stores) {
         this.stores = stores;
+
+        cardViewIndexId = 0;
     }
+
+
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
@@ -75,14 +72,36 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreV
         return new StoreView(view);
     }
 
+    Vector<Integer> intexAssignedClickEvent = new Vector<>();
     @Override
     public void onBindViewHolder(StoreView storeView, int i) {
         storeView.storeName.setText(stores.get(i).name);
         storeView.storeAddress.setText(stores.get(i).address);
         storeView.storeRating.setRating(stores.get(i).rating);
+        storeView.store = stores.get(i);
         storeView.storePicture.setImageResource(R.drawable.icon_two);
         storeView.storePicture.setMaxWidth(50);
         storeView.storePicture.setMaxHeight(50);
+
+        //Confirm the index hasn't already been set a on click event based on index added into global vector and
+        //Since I increments if scrolling up even make sure its withi the size of stores.
+        if(!intexAssignedClickEvent.contains(i) && i < stores.size()) {
+            storeView.cardView.setId(cardViewIndexId);
+            storeView.cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("ONCLICK", v.getId() + " ");
+                    Context c = v.getContext();
+                    Intent intent = new Intent(v.getContext(), StoreItemView.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("store_data",storeView.store);
+                    intent.putExtras(bundle);
+                    c.startActivity(intent);
+                }
+            });
+            ++cardViewIndexId;
+        }
+        intexAssignedClickEvent.add(i);
     }
 
     @Override
