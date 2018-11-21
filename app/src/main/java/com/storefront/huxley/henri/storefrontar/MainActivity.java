@@ -44,6 +44,12 @@ import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
 
+/*
+Developer: Evan Yohnicki-Huxley & Patrick Henri
+Purpose: Starting Activity Requesting Address or Location Permission
+Date: November 10th 2018
+*/
+
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
     double lat, lng;
@@ -64,59 +70,82 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     Date: November 10th 2018
     */
     public void onSearchClick(View view) {
+        //Disable search button after being selected to enforce no spam
         buttonSearch.setClickable(false);
+        //generate url for pulling coordinates of location
         String getCordsURL = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=" + ((EditText) findViewById(R.id.address_input)).getText().toString() + "&inputtype=textquery&fields=geometry&key=" + getResources().getString(R.string.placesKey);
-        //Toast.makeText(this, getCordsURL, Toast.LENGTH_SHORT).show();
 
+        //Generate the Request and Return the JSON
         RequestParams rp = new RequestParams();
-        //rp.add("username", "aaa"); rp.add("password", "aaa@123");
-
-        HttpUtils.getByUrl(getCordsURL, rp, new JsonHttpResponseHandler() {
+        HttpClient.obtainFromUrl(getCordsURL, rp, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // If the response is JSONObject instead of expected JSONArray
-                Log.d("asd", "---------------- this is response : " + response);
+                Log.d("MainActivity_onSuccess", "------ JSON Object : " + response);
                 try {
+                    //Pull the repsonse into and object
                     JSONObject serverResp = new JSONObject(response.toString());
+                    //Narrow down to the coords
                     JSONObject element = serverResp.getJSONArray("candidates").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
+                    //pull each coord
                     lat = element.getDouble("lat");
                     lng = element.getDouble("lng");
 
+                    //Create intent to obtain list based on coord
                     Intent intent = new Intent(MainActivity.this, StoresNearListActivity.class);
                     intent.putExtra("lat", lat);
                     intent.putExtra("lng", lng);
                     startActivity(intent);
 
                 } catch (JSONException e) {
+                    //If there was a error pulling the lat and lng inform the user and re-enable the button
                     ((TextView) findViewById(R.id.txt_Searching)).setText(R.string.errorCoords);
                     ((TextView) findViewById(R.id.txt_Searching)).setVisibility(View.VISIBLE);
+                    buttonSearch.setClickable(true);
                 }
             }
+
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
+                ((TextView) findViewById(R.id.txt_Searching)).setText(R.string.errorCoords);
+                ((TextView) findViewById(R.id.txt_Searching)).setVisibility(View.VISIBLE);
+                buttonSearch.setClickable(true);
             }
         });
+        //Enable button
         buttonSearch.setClickable(true);
     }
 
+    /*
+    Developer: Evan Yohnicki-Huxley
+    Purpose: Obtain User Coordinates using the built in GPS
+    Date: November 16th 2018
+    */
     public void onUserCoords(View view) {
+        //If no permissions then request permissions
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         }
-
+        //If they don't access end the function
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+
+        //Inform the user its pulling coords and start the update request
         ((TextView) findViewById(R.id.txt_Searching)).setText(R.string.pullCoords);
         ((TextView) findViewById(R.id.txt_Searching)).setVisibility(View.VISIBLE);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates("gps", 0, 0, this);
 
     }
-
+    /*
+    Developer: Evan Yohnicki-Huxley
+    Purpose: Obtain User Coordinates using onLocationOverride in the locationManager
+    Date: November 16th 2018
+    */
     @Override
     public void onLocationChanged(Location location) {
         locationManager.removeUpdates(this);
@@ -126,12 +155,28 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         startActivity(intent);
     }
 
+    /*
+    Developer: Evan Yohnicki-Huxley
+    Purpose: Rerun the onUserCoords if they accept the permission for GPS usage
+    Date: November 16th 2018
+    */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        onUserCoords(findViewById(R.id.txt_Searching));
+        for(int i =0;i<grantResults.length;++i) {
+            if (grantResults[i] == PackageManager.PERMISSION_GRANTED && permissions[i].equals("android.permission.ACCESS_FINE_LOCATION")) {
+                ((TextView) findViewById(R.id.txt_Searching)).setText(R.string.pullCoords);
+                ((TextView) findViewById(R.id.txt_Searching)).setVisibility(View.VISIBLE);
+                onUserCoords(findViewById(R.id.txt_Searching));
+            }
+        }
     }
 
+    /*
+      Developer: Evan Yohnicki-Huxley
+      Purpose: Disables the coords searching text if they used that method prior and return to main menu
+      Date: November 16th 2018
+     */
     @Override
     protected void onResume() {
         super.onResume();

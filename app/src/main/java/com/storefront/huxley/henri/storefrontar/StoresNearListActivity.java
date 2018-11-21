@@ -43,6 +43,12 @@ import java.util.Random;
 
 import cz.msebera.android.httpclient.Header;
 
+/*
+Developer: Evan Yohnicki-Huxley & Patrick Henri
+Purpose: Activity Storing all the near stores
+Date: November 12th 2018
+*/
+
 public class StoresNearListActivity extends AppCompatActivity {
     public int x = 0;
     private List<Store> stores;
@@ -51,9 +57,6 @@ public class StoresNearListActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RecyclerAdapter recyclerAdapter;
     private ProgressBar spinner;
-
-
-    String usersAddress;
     double lat, lng;
 
     @Override
@@ -80,6 +83,11 @@ public class StoresNearListActivity extends AppCompatActivity {
     }
 
 
+    /*
+    Developer: Evan Yohnicki-Huxley
+    Purpose: Adds Products ot an array list to be added randomly selected for a store
+    Date: November 16th 2018
+    */
     private void addProducts()
     {
         products = new ArrayList<Product>();
@@ -94,14 +102,14 @@ public class StoresNearListActivity extends AppCompatActivity {
 
     /*
     Developer: Evan Yohnicki-Huxley & Patrick Henri
-    Purpose: Obtain Places from Coordinates.
+    Purpose: Obtain Places based on the users Coordinates.
     Date: November 10th 2018 - updated 11/14/2018
     */
     private void ObtainListOfLocations() {
         String getCordsURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lng + "&radius=50000&type=furniture_store&key=" + getResources().getString(R.string.placesKey);
 
         RequestParams rp = new RequestParams();
-        HttpUtils.getByUrl(getCordsURL, rp, new JsonHttpResponseHandler() {
+        HttpClient.obtainFromUrl(getCordsURL, rp, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -145,7 +153,7 @@ public class StoresNearListActivity extends AppCompatActivity {
             Log.d("aids", "achieved");
             x = i;
             String url = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + stores.get(i).reference + "&key=" + getResources().getString(R.string.placesKey);
-            HttpUtils.getByUrl(url, rp, new JsonHttpResponseHandler() {
+            HttpClient.obtainFromUrl(url, rp, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     String phoneno = "";

@@ -31,19 +31,27 @@ import java.util.Random;
 
 import cz.msebera.android.httpclient.Header;
 
+/*
+Developer: Evan Yohnicki-Huxley & Patrick Henri
+Purpose: Activity Showing the Store Item
+Date: November 12th 2018
+*/
+
 public class StoreItemView extends AppCompatActivity {
-    private ImageView image, image2;
-    private TextView name, address, website, phone, price, description;
-    private RatingBar rating;
-    private Random rnd = new Random();
-    private static final double MIN_OPENGL_VERSION = 3.0;
-    Product product;
+
+
     Store store;
 
+    //On Create sets the items values to the the text fields
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_store_item_view);
+
+        ImageView  image2;
+        TextView name, address, website, phone, price;
+        RatingBar rating;
+
         Store store = (Store) getIntent().getExtras().getSerializable("store_data");
         this.store = store;
 
@@ -58,6 +66,7 @@ public class StoreItemView extends AppCompatActivity {
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         image2.setMinimumWidth(displayMetrics.widthPixels);
 
+        //Sets the text fields some check if null, if null hide.
         name.setText(store.name);
         hideIfNull(address, store.address);
         if(store.websiteUrl != null) {
@@ -68,13 +77,16 @@ public class StoreItemView extends AppCompatActivity {
         }
         hideIfNull(phone, store.phoneno);
 
+        //Set rating
         rating.setNumStars(5);
         rating.setIsIndicator(true);
         rating.setRating(store.rating);
 
+        //Set description and cost
         ((TextView) findViewById(R.id.storeitem_description)).setText(store.selectedProduct.productDescription);
         ((TextView) findViewById(R.id.storeitem_price)).setText(store.selectedProduct.productCost);
 
+        //setup images
         try {
             Resources resources = this.getResources();
             final int resourceId = resources.getIdentifier(store.selectedProduct.productObjectName, "drawable", this.getPackageName());
@@ -85,6 +97,12 @@ public class StoreItemView extends AppCompatActivity {
         }
     }
 
+
+    /*
+    Developer: Evan Yohnicki-Huxley
+    Purpose: Rerun the onUserCoords if they accept the permission for GPS usage
+    Date: November 16th 2018
+    */
     public void hideIfNull(TextView txt, String value) {
         if (value == null)
             txt.setVisibility(View.INVISIBLE);
@@ -92,6 +110,11 @@ public class StoreItemView extends AppCompatActivity {
             txt.setText(value);
     }
 
+    /*
+    Developer: Evan Yohnicki-Huxley
+    Purpose: Opens the ar view using the object name in the product object
+    Date: November 16th 2018
+    */
     public void viewInAR(View view) {
         Intent intent = new Intent(this, ARCore.class);
         intent.putExtra("filename", store.selectedProduct.productObjectName + ".sfb");
@@ -99,18 +122,33 @@ public class StoreItemView extends AppCompatActivity {
     }
 
 
+    /*
+    Developer: Evan Yohnicki-Huxley
+    Purpose: opens phone intent using the stores phone number
+    Date: November 16th 2018
+    */
     public void openPhone(View view) {
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse("tel:" + store.phoneno));
         startActivity(intent);
     }
 
+    /*
+    Developer: Evan Yohnicki-Huxley
+    Purpose: Opens the website supplied
+    Date: November 16th 2018
+    */
     public void openWebsite(View view) {
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(store.websiteUrl));
         startActivity(i);
     }
 
+    /*
+    Developer: Evan Yohnicki-Huxley
+    Purpose: Will open google maps to the places location if maps is installed
+    Date: November 16th 2018
+    */
     public void openMaps(View view) {
 
         //Check if Maps is installed otherwise don't
@@ -125,7 +163,7 @@ public class StoreItemView extends AppCompatActivity {
         String getCordsURL = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=" + store.address + "&inputtype=textquery&fields=geometry&key=" + getResources().getString(R.string.placesKey);
 
             RequestParams rp = new RequestParams();
-            HttpUtils.getByUrl(getCordsURL, rp, new JsonHttpResponseHandler() {
+            HttpClient.obtainFromUrl(getCordsURL, rp, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     // If the response is JSONObject instead of expected JSONArray

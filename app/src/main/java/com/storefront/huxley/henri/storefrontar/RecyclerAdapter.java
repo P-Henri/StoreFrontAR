@@ -22,7 +22,13 @@ import java.util.List;
 import java.util.Vector;
 
 import static android.support.v4.app.ActivityCompat.startActivityForResult;
+import static android.support.v4.app.ActivityCompat.startIntentSenderForResult;
 
+/*
+Developer: Evan Yohnicki-Huxley & Patrick Henri
+Purpose: RecyclerAdapter binded to StoreView to provide a nice Card scroll view.
+Date: November 12th 2018
+*/
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreView> {
     static private List<Store> stores;
     static private int cardViewIndexId = 0;
@@ -37,13 +43,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreV
 
         StoreView(View itemView) {
             super(itemView);
-
             cardView = itemView.findViewById(R.id.cv);
             storeName = itemView.findViewById(R.id.store_name);
             storeAddress = itemView.findViewById(R.id.store_address);
             storeRating = itemView.findViewById(R.id.store_rating);
             storePicture = itemView.findViewById(R.id.store_photo);
-
             storeRating.setNumStars(5);
             storeRating.setIsIndicator(true);
         }
@@ -67,6 +71,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreV
 
     @Override
     public void onBindViewHolder(StoreView storeView, int i) {
+        //On scroll generate new items and set the values
         storeView.storeName.setText(stores.get(i).name);
         storeView.storeAddress.setText(stores.get(i).address);
         storeView.storeRating.setRating(stores.get(i).rating);
@@ -76,21 +81,23 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreV
         storeView.storePicture.setMaxHeight(50);
 
         //Confirm the index hasn't already been set a on click event based on index added into global vector and
-        //Since I increments if scrolling up even make sure its withi the size of stores.
+        //Since I increments if scrolling up even make sure its with the size of stores so it doesn't continue past vector size.
         if(!intexAssignedClickEvent.contains(i) && i < stores.size()) {
+            //Set the id of the card to be obtained in the onclick
             storeView.cardView.setId(cardViewIndexId);
             storeView.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("ONCLICK", v.getId() + " ");
+                    //Transfer the serializable object to the store item view class
                     Context c = v.getContext();
-                    Intent intent = new Intent(v.getContext(), StoreItemView.class);
+                    Intent intent = new Intent(c, StoreItemView.class);
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable("store_data",storeView.store);
+                    bundle.putSerializable("store_data", storeView.store);
                     intent.putExtras(bundle);
                     c.startActivity(intent);
                 }
             });
+            //increment for the next cards id
             ++cardViewIndexId;
         }
         intexAssignedClickEvent.add(i);

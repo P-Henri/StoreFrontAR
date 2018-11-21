@@ -22,6 +22,14 @@ import com.google.ar.sceneform.rendering.ViewRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
+/*
+Developer: Andrea Classen
+Modified By: Evan Yohnicki-Huxley
+Purpose: Takes the Existing AR example from Andrea and removes the widget overlay, limits to a single item and allows that item to be removed at any time by a button on the arcore view
+Date: November 10th 2018
+*/
+
+
 public class ARCore extends AppCompatActivity {
 
     private static final String TAG = ARCore.class.getName();
@@ -41,7 +49,6 @@ public class ARCore extends AppCompatActivity {
         file_name = getIntent().getExtras().getString("filename");
 
         // make sure OpenGL version is supported
-
         if (!checkIsSupportedDevice(this)) {
             String errorMessage =  "Sceneform requires OpenGL ES " + MIN_OPENGL_VERSION + " or later";
             Log.e(TAG, errorMessage);
@@ -126,8 +133,8 @@ public class ARCore extends AppCompatActivity {
     }
 
 
+    //Determines if the device supports ARCore
     private boolean checkIsSupportedDevice(final Activity activity) {
-
         ActivityManager activityManager =
                 (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
 
@@ -141,10 +148,22 @@ public class ARCore extends AppCompatActivity {
         return openGlVersion != null && Double.parseDouble(openGlVersion) >= MIN_OPENGL_VERSION;
     }
 
+
+    /*
+    Developer: Evan Yohnicki-Huxley
+    Purpose: Return to product item screen
+    Date: November 18th 2018
+    */
+
     public void btn_Return(View view) {
         onBackPressed();
     }
 
+    /*
+    Developer: Evan Yohnicki-Huxley
+    Purpose: Remove the active node
+    Date: November 18th 2018
+    */
     public void btn_Reset(View view) {
         if(aNode != null) {
             aNode.getAnchor().detach();

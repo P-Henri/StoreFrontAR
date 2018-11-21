@@ -2,7 +2,17 @@ package com.storefront.huxley.henri.storefrontar;
 
 import java.io.Serializable;
 
+
+
+/*
+Developer: Evan Yohnicki-Huxley
+Purpose: Serializable to pass between activities
+Date: November 16th 2018
+*/
+
 public class Product implements Serializable {
+
+    //All Product Values and a constructor to set the values
     public String productName;
     public String productDescription;
     public String productObjectName;
