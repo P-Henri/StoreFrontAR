@@ -50,13 +50,12 @@ Date: November 12th 2018
 */
 
 public class StoresNearListActivity extends AppCompatActivity {
-    public int x = 0;
     private List<Store> stores;
-    Random rnd = new Random();
     private List<Product> products;
     private RecyclerView recyclerView;
     private RecyclerAdapter recyclerAdapter;
     private ProgressBar spinner;
+    private Random rnd = new Random();
     double lat, lng;
 
     @Override
@@ -69,7 +68,6 @@ public class StoresNearListActivity extends AppCompatActivity {
         lat = (getIntent().getExtras()).getDouble("lat");
         lng = (getIntent().getExtras()).getDouble("lng");
 
-
         stores = new ArrayList<>();
         spinner = findViewById(R.id.progressBar1);
         recyclerView = findViewById(R.id.recyclerView);
@@ -81,7 +79,6 @@ public class StoresNearListActivity extends AppCompatActivity {
 
         ObtainListOfLocations();
     }
-
 
     /*
     Developer: Evan Yohnicki-Huxley
@@ -97,8 +94,6 @@ public class StoresNearListActivity extends AppCompatActivity {
         products.add(new Product("Wooden Bed Side Table","A small and basic wooden bedside table with metal handles","eb_nightstand_01","$172.99"));
         products.add(new Product("Wooden Dinning Room Table","A perfect standard wooden table for a large families looking to get together around the table.","table","$319.99"));
     }
-
-
 
     /*
     Developer: Evan Yohnicki-Huxley & Patrick Henri
@@ -118,6 +113,7 @@ public class StoresNearListActivity extends AppCompatActivity {
                 try {
                     double rating = 0.0;
                     String photoref = "";
+                    String name = "";
                     JSONObject serverResp = new JSONObject(response.toString());
                     //JSONObject element = serverResp.getJSONArray("candidates").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
                     JSONArray element = serverResp.getJSONArray("results");
@@ -128,13 +124,19 @@ public class StoresNearListActivity extends AppCompatActivity {
                         if (element.getJSONObject(i).has("photos")) {
                             photoref = element.getJSONObject(i).getJSONArray("photos").getJSONObject(0).get("photo_reference").toString();
                         }
-                        stores.add(new Store(element.getJSONObject(i).get("name").toString(), element.getJSONObject(i).get("vicinity").toString(), (float) rating, element.getJSONObject(i).getString("reference"), photoref,products.get(rnd.nextInt(products.size()))));
+                        if(element.getJSONObject(i).get("name").toString().length() > 34) {
+                            name = element.getJSONObject(i).get("name").toString().substring(0, 34);
+                            name += "...";
+                        }
+                        else {
+                            name = element.getJSONObject(i).get("name").toString();
+                        }
+                        stores.add(new Store(name, element.getJSONObject(i).get("vicinity").toString(), (float) rating, element.getJSONObject(i).getString("reference"), photoref,products.get(rnd.nextInt(products.size()))));
                     }
-                    //stores.sort(); //sort by rating pls
-                    recyclerAdapter = new RecyclerAdapter(stores);
-                    recyclerView.setAdapter(recyclerAdapter);
-                    spinner.setVisibility(View.GONE);
-                    ObtainExtras();
+
+                    for (int i = 0; i < stores.size(); ++i) {
+                        ObtainExtras(i);
+                    }
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -147,34 +149,39 @@ public class StoresNearListActivity extends AppCompatActivity {
        Purpose: Obtains extra info for Places found earlier from Coordinates.
        Date: November 17th 2018
     */
-    private void ObtainExtras() {
+    private void ObtainExtras(final int x) {
         RequestParams rp = new RequestParams();
-        for (int i = 0; i < stores.size(); ++i) {
-            Log.d("aids", "achieved");
-            x = i;
-            String url = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + stores.get(i).reference + "&key=" + getResources().getString(R.string.placesKey);
-            HttpClient.obtainFromUrl(url, rp, new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    String phoneno = "";
-                    String website = "";
-                    try {
-                        JSONObject serverResp = new JSONObject(response.toString());
-                        JSONObject element = serverResp.getJSONObject("result");
-                        if (element.has("website")) {
-                            website = element.get("website").toString();
-                        }
-                        if (element.has("formatted_phone_number")) {
-                            phoneno = element.get("formatted_phone_number").toString();
-                        }
-                        stores.get(x).SetExtras(website, phoneno);
-                        Log.d("asd", "---------------- this is response : " + stores.get(x).websiteUrl);
-                    } catch (JSONException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+        String url = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + stores.get(x).reference + "&key=" + getResources().getString(R.string.placesKey);
+        HttpClient.obtainFromUrl(url, rp, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                String phoneno = "";
+                String website = "";
+                try {
+                    JSONObject serverResp = new JSONObject(response.toString());
+                    JSONObject element = serverResp.getJSONObject("result");
+
+                    if (element.has("website")) {
+                        website = element.get("website").toString();
                     }
+                    if (element.has("formatted_phone_number")) {
+                        phoneno = element.get("formatted_phone_number").toString();
+                    }
+                    Log.e("VALUE", "---------------- this is response : " + x);
+                    stores.get(x).SetExtras(website, phoneno);
+                    Log.e("asd", "---------------- this is response : " + stores.get(x).websiteUrl);
+
+                    if(x == stores.size()-1) {
+                        recyclerAdapter = new RecyclerAdapter(stores);
+                        recyclerView.setAdapter(recyclerAdapter);
+                        spinner.setVisibility(View.GONE);
+                    }
+                    //stores.sort(); //sort by rating pls
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
-            });
-        }
+            }
+        });
     }
 }

@@ -73,14 +73,14 @@
 
     <ImageView
         android:id="@+id/imageView3"
-        android:layout_width="75dp"
-        android:layout_height="79dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="28dp"
         android:clickable="true"
         android:onClick="onUserCoords"
         app:layout_constraintBottom_toBottomOf="@+id/address_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/address_input"
-        app:layout_constraintVertical_bias="0.642"
         app:srcCompat="@drawable/maps" />
 
     <TextView

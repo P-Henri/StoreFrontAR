@@ -1,19 +1,18 @@
 <resources>
     <string name="app_name">Storefront.</string>
     <string name="address_field">Enter your address to get started!</string>
-    <string name="button_search">search</string>
+    <string name="button_search">SEARCH</string>
     <string name="featured">View it in AR!</string>
     <string name="button_ar">View in AR</string>
     <string name="featured_product">Featured Product</string>
     <string name="goBack">Return</string>
     <string name="reset">Reset</string>
+    <string name="desc">Description: </string>
+    <string name="price">Price: </string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
-
-
-    <string name="placesKey">AIzaSyCNn3rbBz-ERQp_rH4QkCou4E5wYLl7XV0</string>
+    <!-- <string name="placesKey">AIzaSyCNn3rbBz-ERQp_rH4QkCou4E5wYLl7XV0</string> -->
+    <string name="placesKey">AIzaSyBU5ZEw2upW5uVmpJMkVCBvKq5YYLb8QJM</string>
     <string name="pullCoords">Pulling Coords</string>
     <string name="errorCoords">Error Could Not Find Supplied Address</string>
+    <string name="website_click">click here to view website</string>
 </resources>

@@ -49,7 +49,7 @@ public class StoreItemView extends AppCompatActivity {
         setContentView(R.layout.activity_store_item_view);
 
         ImageView  image2;
-        TextView name, address, website, phone, price;
+        TextView name, address, website, phone;
         RatingBar rating;
 
         Store store = (Store) getIntent().getExtras().getSerializable("store_data");
@@ -59,7 +59,6 @@ public class StoreItemView extends AppCompatActivity {
         address = findViewById(R.id.storeitem_address);
         website = findViewById(R.id.storeitem_website);
         phone = findViewById(R.id.storeitem_phone);
-        price = findViewById(R.id.storeitem_price);
         rating = findViewById(R.id.storeitem_rating);
         image2 = findViewById(R.id.imageView2);
 
@@ -67,13 +66,18 @@ public class StoreItemView extends AppCompatActivity {
         image2.setMinimumWidth(displayMetrics.widthPixels);
 
         //Sets the text fields some check if null, if null hide.
-        name.setText(store.name);
+        String nameStr = store.name;
+        if(store.name.length() > 26) {
+            nameStr = store.name.substring(0, 26);
+            nameStr += "...";
+        }
+        name.setText(nameStr);
         hideIfNull(address, store.address);
         if(store.websiteUrl != null) {
-            website.setText("click here to view website");
+            website.setText(R.string.website_click);
         }
         else {
-            hideIfNull(website, store.websiteUrl);
+            website.setText("");
         }
         hideIfNull(phone, store.phoneno);
 
@@ -84,13 +88,13 @@ public class StoreItemView extends AppCompatActivity {
 
         //Set description and cost
         ((TextView) findViewById(R.id.storeitem_description)).setText(store.selectedProduct.productDescription);
-        ((TextView) findViewById(R.id.storeitem_price)).setText(store.selectedProduct.productCost);
+        ((TextView) findViewById(R.id.storeitem_price)).setText("Price: " + store.selectedProduct.productCost);
 
         //setup images
         try {
             Resources resources = this.getResources();
             final int resourceId = resources.getIdentifier(store.selectedProduct.productObjectName, "drawable", this.getPackageName());
-            ((ImageView) findViewById(R.id.productImg)).setImageDrawable(resources.getDrawable(resourceId));
+            ((ImageView) findViewById(R.id.productImg)).setImageResource(resourceId);
         }
         catch(Exception e){
             ((ImageView) findViewById(R.id.productImg)).setVisibility(View.INVISIBLE);

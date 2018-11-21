@@ -30,16 +30,18 @@ Purpose: RecyclerAdapter binded to StoreView to provide a nice Card scroll view.
 Date: November 12th 2018
 */
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreView> {
-    static private List<Store> stores;
+    private StoreView sv;
+    private List<Store> stores;
     static private int cardViewIndexId = 0;
     private Vector<Integer> intexAssignedClickEvent = new Vector<>();
+
     public static class StoreView extends RecyclerView.ViewHolder {
         Store store;
         CardView cardView;
         TextView storeName;
         TextView storeAddress;
         RatingBar storeRating;
-        ImageView storePicture;
+        //ImageView storePicture;
 
         StoreView(View itemView) {
             super(itemView);
@@ -47,7 +49,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreV
             storeName = itemView.findViewById(R.id.store_name);
             storeAddress = itemView.findViewById(R.id.store_address);
             storeRating = itemView.findViewById(R.id.store_rating);
-            storePicture = itemView.findViewById(R.id.store_photo);
+            //storePicture = itemView.findViewById(R.id.store_photo);
             storeRating.setNumStars(5);
             storeRating.setIsIndicator(true);
         }
@@ -69,18 +71,16 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreV
         return new StoreView(view);
     }
 
-    StoreView sv;
     @Override
-    public void onBindViewHolder(StoreView storeView, int i) {
-        sv = storeView;
+    public void onBindViewHolder(final StoreView storeView, int i) {
         //On scroll generate new items and set the values
         storeView.storeName.setText(stores.get(i).name);
         storeView.storeAddress.setText(stores.get(i).address);
         storeView.storeRating.setRating(stores.get(i).rating);
         storeView.store = stores.get(i);
-        storeView.storePicture.setImageResource(R.drawable.icon_two);
-        storeView.storePicture.setMaxWidth(50);
-        storeView.storePicture.setMaxHeight(50);
+        //storeView.storePicture.setImageResource(R.drawable.icon_two);
+        //storeView.storePicture.setMaxWidth(50);
+        //storeView.storePicture.setMaxHeight(50);
 
         //Confirm the index hasn't already been set a on click event based on index added into global vector and
         //Since I increments if scrolling up even make sure its with the size of stores so it doesn't continue past vector size.
@@ -90,6 +90,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreV
             storeView.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    sv = storeView;
                     //Transfer the serializable object to the store item view class
                     Context c = v.getContext();
                     Intent intent = new Intent(c, StoreItemView.class);
