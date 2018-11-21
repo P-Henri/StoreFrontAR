@@ -69,8 +69,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreV
         return new StoreView(view);
     }
 
+    StoreView sv;
     @Override
     public void onBindViewHolder(StoreView storeView, int i) {
+        sv = storeView;
         //On scroll generate new items and set the values
         storeView.storeName.setText(stores.get(i).name);
         storeView.storeAddress.setText(stores.get(i).address);
@@ -92,7 +94,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.StoreV
                     Context c = v.getContext();
                     Intent intent = new Intent(c, StoreItemView.class);
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable("store_data", storeView.store);
+                    bundle.putSerializable("store_data", sv.store);
                     intent.putExtras(bundle);
                     c.startActivity(intent);
                 }
