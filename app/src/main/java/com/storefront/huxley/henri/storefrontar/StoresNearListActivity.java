@@ -1,18 +1,3 @@
-/*
- * Copyright 2017 Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.storefront.huxley.henri.storefrontar;
 
 import android.os.Bundle;
@@ -30,15 +15,9 @@ import com.loopj.android.http.RequestParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xml.sax.Parser;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 import cz.msebera.android.httpclient.Header;
@@ -88,11 +67,16 @@ public class StoresNearListActivity extends AppCompatActivity {
     private void addProducts()
     {
         products = new ArrayList<Product>();
-        products.add(new Product("Bench","A Bench made from quality walnut wood.","bench","$212.99"));
-        products.add(new Product("Coffee Table","A modern take on a required peice of furniture for all homes. Great to wow your guests with your sophisticated style.","coffeetable","$122.99"));
-        products.add(new Product("Modern Sectional Couch","A beautiful white sectional couch to show off your style and eye for quality furniture.","couch","$1202.99"));
-        products.add(new Product("Wooden Bed Side Table","A small and basic wooden bedside table with metal handles","eb_nightstand_01","$172.99"));
-        products.add(new Product("Wooden Dinning Room Table","A perfect standard wooden table for a large families looking to get together around the table.","table","$319.99"));
+        //Description from https://www.ikea.lv/en/products/kitchen/dining-seating/chairs-and-benches/industriell-bench-light-grey-art-30394538
+        products.add(new Product("Bench","Only for indoor use. Seats 2-3.This bench has been tested for domestic use and meets the requirements for durability and safety, set forth in the following standards: EN 12520, EN 1728 and EN 1022. For increased stability, re-tighten the screws about two weeks after assembly and when necessary. May be completed with FIXA stick-on floor protectors; protect the underlying surface against wear.","bench","$212.99"));
+        //Description from https://www.ikea.lv/en/products/kitchen/dining-tables/tables/melltorp-table-white-spr-89280035
+        products.add(new Product("Coffee Table","MELLTORP table has four legs, a melamine top (which shrugs off coffee or red wine spills) and it’s designed to last for years of busy everyday life. The part where it stands out is its price tag. To make MELLTORP more affordable we make the table top and legs separately, then ship them directly to the store, cutting out any extra production steps that could add to the price. There are two boxes to pick up, but at a price that leaves money over for well, maybe a nice dinner.","coffeetable","$122.99"));
+        //Description from https://www.ikea.lv/en/products/bedroom/sofa-armchairs/sofas/vimle-1-seat-section-beige-spr-59253260
+        products.add(new Product("Modern Sectional Couch","All the cotton in our products comes from more sustainable sources. This means that the cotton is either recycled, or grown with less water, less fertilisers and less pesticides, while increasing profit margins for the farmers.","couch","$1202.99"));
+        //Description from https://www.ikea.lv/en/products/bedroom/bedside-tables/bedside-tables/tyssedal-bedside-table-white-art-70299959
+        products.add(new Product("Wooden Bed Side Table","Light, neat and soft – with a handcrafted feeling in every detail. That’s a short description of the TYSSEDAL bedroom series. But there’s much more we’d like to tell you about. Like the fact that the sunlight can filter through the headboard, the wardrobe has mirrored doors and the chests of drawers and bedside table have softly shaped tops and drawer bottoms with a printed pattern. All the pieces are on turned legs and have handles in brushed chrome. TYSSEDAL is a complete bedroom series with quality and style that will last for many years.","eb_nightstand_01","$172.99"));
+        //Description from https://www.ikea.lv/en/products/dining-room/dining-seating/garden-chairs-benches-loungers/sjalland-table-outdoor-light-grey-light-brown-spr-79262447
+        products.add(new Product("Wooden Dinning Room Table","The table top in wood is made from eucalyptus slats, all with grain variations and natural colour shifts that give the table a warm and natural look. You can choose between table tops in different materials, depending on what suits you and your patio ‒ and if you prefer a maintenance-free material like aluminum or the warmth of durable eucalyptus.","table","$319.99"));
     }
 
     /*
@@ -113,7 +97,6 @@ public class StoresNearListActivity extends AppCompatActivity {
                 try {
                     double rating = 0.0;
                     String photoref = "";
-                    String name = "";
                     JSONObject serverResp = new JSONObject(response.toString());
                     //JSONObject element = serverResp.getJSONArray("candidates").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
                     JSONArray element = serverResp.getJSONArray("results");
@@ -124,16 +107,14 @@ public class StoresNearListActivity extends AppCompatActivity {
                         if (element.getJSONObject(i).has("photos")) {
                             photoref = element.getJSONObject(i).getJSONArray("photos").getJSONObject(0).get("photo_reference").toString();
                         }
-                        if(element.getJSONObject(i).get("name").toString().length() > 34) {
-                            name = element.getJSONObject(i).get("name").toString().substring(0, 34);
-                            name += "...";
-                        }
-                        else {
-                            name = element.getJSONObject(i).get("name").toString();
-                        }
-                        stores.add(new Store(name, element.getJSONObject(i).get("vicinity").toString(), (float) rating, element.getJSONObject(i).getString("reference"), photoref,products.get(rnd.nextInt(products.size()))));
+                        stores.add(new Store(element.getJSONObject(i).get("name").toString(), element.getJSONObject(i).get("vicinity").toString(), (float) rating, element.getJSONObject(i).getString("reference"), photoref,products.get(rnd.nextInt(products.size()))));
                     }
-
+                    /* No Stores Found Fix */
+                    if(stores.size() == 0) {
+                        Toast.makeText(StoresNearListActivity.this,"No Stores Found Near You!", Toast.LENGTH_LONG).show();
+                        onBackPressed();
+                        return;
+                    }
                     for (int i = 0; i < stores.size(); ++i) {
                         ObtainExtras(i);
                     }

@@ -15,4 +15,9 @@
     <string name="pullCoords">Pulling Coords</string>
     <string name="errorCoords">Error Could Not Find Supplied Address</string>
     <string name="website_click">click here to view website</string>
+    <string name="price_string">Price:</string>
+    <string name="error_directions">Error Obtaining Directions</string>
+    <string name="error_invalid">Error: invalid address(?)</string>
+    <string name="pulling_coords">Pulling your coordinates via gps...</string>
+    <string name="network_provider_msg">Using network provider instead of GPS</string>
 </resources>

@@ -1,21 +1,15 @@
 package com.storefront.huxley.henri.storefrontar;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.preference.PreferenceActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -26,8 +20,6 @@ import com.loopj.android.http.RequestParams;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Random;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -88,7 +80,7 @@ public class StoreItemView extends AppCompatActivity {
 
         //Set description and cost
         ((TextView) findViewById(R.id.storeitem_description)).setText(store.selectedProduct.productDescription);
-        ((TextView) findViewById(R.id.storeitem_price)).setText("Price: " + store.selectedProduct.productCost);
+        ((TextView) findViewById(R.id.storeitem_price)).setText(getString(R.string.price_string) + store.selectedProduct.productCost);
 
         //setup images
         try {
@@ -184,9 +176,8 @@ public class StoreItemView extends AppCompatActivity {
                         if (mapIntent.resolveActivity(getPackageManager()) != null) {
                             startActivity(mapIntent);
                         }
-
                     } catch (JSONException e) {
-                        Toast.makeText(StoreItemView.this, "Error Obtaining Directions", Toast.LENGTH_LONG).show();
+                        Toast.makeText(StoreItemView.this, R.string.error_directions, Toast.LENGTH_LONG).show();
                     }
                 }
 

@@ -64,6 +64,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat"
         android:textColor="#000"
         android:textSize="15sp"
+        android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -72,7 +73,7 @@
         app:layout_constraintVertical_bias="0.009" />
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/img_gps_find"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginEnd="28dp"
@@ -82,18 +83,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/address_input"
         app:srcCompat="@drawable/maps" />
-
-    <TextView
-        android:id="@+id/txt_Searching"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
-        android:text="Pulling Coordinates . . ."
-        android:textAlignment="center"
-        android:textColor="#FFF"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

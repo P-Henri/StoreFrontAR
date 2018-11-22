@@ -1,39 +1,24 @@
 package com.storefront.huxley.henri.storefrontar;
 
 import android.Manifest;
-import android.app.Activity;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 
-import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -55,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     double lat, lng;
     private LocationManager locationManager;
     private Button buttonSearch;
+    private ImageView image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         setContentView(R.layout.activity_main);
 
         buttonSearch = findViewById(R.id.button_search);
+        image = findViewById(R.id.img_gps_find);
     }
 
     /*
@@ -100,8 +87,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
                 } catch (JSONException e) {
                     //If there was a error pulling the lat and lng inform the user and re-enable the button
-                    ((TextView) findViewById(R.id.txt_Searching)).setText(R.string.errorCoords);
-                    ((TextView) findViewById(R.id.txt_Searching)).setVisibility(View.VISIBLE);
+                    Toast.makeText(MainActivity.this, R.string.error_invalid, Toast.LENGTH_LONG).show();
                     buttonSearch.setClickable(true);
                 }
             }
@@ -110,13 +96,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                ((TextView) findViewById(R.id.txt_Searching)).setText(R.string.errorCoords);
-                ((TextView) findViewById(R.id.txt_Searching)).setVisibility(View.VISIBLE);
+                Toast.makeText(MainActivity.this, R.string.error_invalid, Toast.LENGTH_LONG).show();
                 buttonSearch.setClickable(true);
             }
         });
-        //Enable button
-        buttonSearch.setClickable(true);
     }
 
     /*
@@ -125,22 +108,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     Date: November 16th 2018
     */
     public void onUserCoords(View view) {
+        image.setClickable(false);
         //If no permissions then request permissions
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+        } else {
+            //Inform the user its pulling coords and start the update request
+            Toast.makeText(this, R.string.pulling_coords, Toast.LENGTH_SHORT).show();
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Location mobileLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (mobileLocation != null) {
+                Log.e("found with gps", "executeFindCoords: found");
+                onLocationChanged(mobileLocation);
+            } else {
+                //Toast.makeText(this, R.string.network_provider_msg, Toast.LENGTH_LONG).show();
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 0, this);
+            }
         }
-        //If they don't access end the function
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-        //Inform the user its pulling coords and start the update request
-        ((TextView) findViewById(R.id.txt_Searching)).setText(R.string.pullCoords);
-        ((TextView) findViewById(R.id.txt_Searching)).setVisibility(View.VISIBLE);
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates("gps", 0, 0, this);
-
     }
+
     /*
     Developer: Evan Yohnicki-Huxley
     Purpose: Obtain User Coordinates using onLocationOverride in the locationManager
@@ -162,12 +148,38 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        boolean found = false;
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        for(int i =0;i<grantResults.length;++i) {
-            if (grantResults[i] == PackageManager.PERMISSION_GRANTED && permissions[i].equals("android.permission.ACCESS_FINE_LOCATION")) {
-                ((TextView) findViewById(R.id.txt_Searching)).setText(R.string.pullCoords);
-                ((TextView) findViewById(R.id.txt_Searching)).setVisibility(View.VISIBLE);
-                onUserCoords(findViewById(R.id.txt_Searching));
+        for (int i = 0; i < grantResults.length; ++i) {
+            if (grantResults[i] == PackageManager.PERMISSION_GRANTED && permissions[i].equals("android.permission.ACCESS_COARSE_LOCATION")) {
+                Toast.makeText(this, R.string.pulling_coords, Toast.LENGTH_SHORT).show();
+                found = true;
+                executeFindCoords();
+            }
+        }
+        if (!found) {
+            Toast.makeText(this, "Error: You must accept location permission to use this feature!", Toast.LENGTH_LONG).show();
+            image.setClickable(true);
+        }
+    }
+
+    /*
+      Developer: Patrick Henri
+      Purpose: Executes after permissions are granted if granted.
+      Date: November 21th 2018
+     */
+    public void executeFindCoords() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            //Inform the user its pulling coords and start the update request
+            Toast.makeText(this, R.string.pulling_coords, Toast.LENGTH_SHORT).show();
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Location mobileLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (mobileLocation != null) {
+                Log.e("found with gps", "executeFindCoords: found");
+                onLocationChanged(mobileLocation);
+            } else {
+                //Toast.makeText(this, R.string.network_provider_msg, Toast.LENGTH_LONG).show();
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 0, this);
             }
         }
     }
@@ -180,8 +192,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     protected void onResume() {
         super.onResume();
-        ((TextView) findViewById(R.id.txt_Searching)).setVisibility(View.INVISIBLE);
-
+        image.setClickable(true);
+        buttonSearch.setClickable(true);
     }
 
     /* REQUIRED LISTENERS */
