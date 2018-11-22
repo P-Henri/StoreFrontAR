@@ -110,20 +110,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void onUserCoords(View view) {
         image.setClickable(false);
         //If no permissions then request permissions
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         } else {
-            //Inform the user its pulling coords and start the update request
-            Toast.makeText(this, R.string.pulling_coords, Toast.LENGTH_SHORT).show();
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            Location mobileLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (mobileLocation != null) {
-                Log.e("found with gps", "executeFindCoords: found");
-                onLocationChanged(mobileLocation);
-            } else {
-                //Toast.makeText(this, R.string.network_provider_msg, Toast.LENGTH_LONG).show();
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 0, this);
-            }
+            executeFindCoords();
         }
     }
 
@@ -151,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         boolean found = false;
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         for (int i = 0; i < grantResults.length; ++i) {
-            if (grantResults[i] == PackageManager.PERMISSION_GRANTED && permissions[i].equals("android.permission.ACCESS_COARSE_LOCATION")) {
+            if (grantResults[i] == PackageManager.PERMISSION_GRANTED && permissions[i].equals("android.permission.ACCESS_FINE_LOCATION")) {
                 Toast.makeText(this, R.string.pulling_coords, Toast.LENGTH_SHORT).show();
                 found = true;
                 executeFindCoords();
@@ -169,17 +159,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
       Date: November 21th 2018
      */
     public void executeFindCoords() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             //Inform the user its pulling coords and start the update request
             Toast.makeText(this, R.string.pulling_coords, Toast.LENGTH_SHORT).show();
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            Location mobileLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (mobileLocation != null) {
-                Log.e("found with gps", "executeFindCoords: found");
-                onLocationChanged(mobileLocation);
-            } else {
+            try {
+                Location mobileLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if (mobileLocation != null) {
+                    Log.e("found with gps", "executeFindCoords: found");
+                    onLocationChanged(mobileLocation);
+                }
+                else
+                {
+                    locationManager.requestLocationUpdates("gps", 1, 0, this);
+                }
+            }catch (Exception e){
                 //Toast.makeText(this, R.string.network_provider_msg, Toast.LENGTH_LONG).show();
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 0, this);
+                locationManager.requestLocationUpdates("gps", 1, 0, this);
             }
         }
     }
